@@ -37,7 +37,7 @@ if ! command -v curl &> /dev/null; then
   exit 1
 fi
 
-if ! command -v docker &> /dev/null || ! command -v docker-compose &> /dev/null || ! command -v docker compose &> /dev/null; then
+if ! command -v docker &> /dev/null || ! command -v docker-compose &> /dev/null || ! command -v 'docker compose' &> /dev/null; then
   echo "❌ Yêu cầu cài đặt Docker và Docker Compose"
   exit 1
 fi
