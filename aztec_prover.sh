@@ -32,8 +32,8 @@ validate_number() {
 }
 
 # ---------- Check Dependencies ----------
-if ! command -v curl &> /dev/null; then
-  echo "❌ Yêu cầu cài đặt curl. Hãy chạy: sudo apt-get install curl (hoặc tương tự)"
+if ! command -v curl -4 &> /dev/null; then
+  echo "❌ Yêu cầu cài đặt curl -4. Hãy chạy: sudo apt-get install curl -4 (hoặc tương tự)"
   exit 1
 fi
 
@@ -63,7 +63,7 @@ echo "========================================"
 WAN_IP=${WAN_IP:-}
 if [ -z "$WAN_IP" ]; then
   echo "🔍 Đang lấy WAN IP tự động..."
-  WAN_IP=$(curl -s ifconfig.me)
+  WAN_IP=$(curl -4 -s ifconfig.me)
   if ! validate_ip "$WAN_IP"; then
     echo "❌ Không thể lấy WAN IP tự động"
     read -p "👉 Vui lòng nhập WAN IP thủ công (e.g., 111.123.456.789): " WAN_IP
