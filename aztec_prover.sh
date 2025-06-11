@@ -65,7 +65,6 @@ services:
         condition: service_started
         required: true
     environment:
-      PROVER_COORDINATION_NODE_URL: "http://$WAN_IP:$API_PORT"
       P2P_IP: "$WAN_IP"
       P2P_ANNOUNCE_ADDRESSES: "/ip4/$WAN_IP/tcp/$P2P_PORT"
       ETHEREUM_HOSTS: "$RPC_SEPOLIA"
