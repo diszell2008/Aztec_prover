@@ -10,6 +10,7 @@ NETWORK="alpha-testnet"
 DATA_DIR="/root/aztec-prover"
 P2P_PORT="40400"
 API_PORT="8080"
+ENV_FILE=".env"
 
 # ---------- Validations ----------
 validate_ip() {
@@ -24,31 +25,97 @@ validate_url() {
   }
 }
 
-# ---------- User Input ----------
+validate_number() {
+  [[ "$1" =~ ^[0-9]+$ ]] && [ "$1" -ge 1 ] || {
+    echo "❌ Invalid number: $1"; exit 1
+  }
+}
+
+# ---------- Check Dependencies ----------
+if ! command -v curl &> /dev/null; then
+  echo "❌ Yêu cầu cài đặt curl. Hãy chạy: sudo apt-get install curl (hoặc tương tự)"
+  exit 1
+fi
+
+if ! command -v docker &> /dev/null || ! command -v docker-compose &> /dev/null; then
+  echo "❌ Yêu cầu cài đặt Docker và Docker Compose"
+  exit 1
+fi
+
+# ---------- Load existing .env file if it exists ----------
+if [ -f "$ENV_FILE" ]; then
+  echo "🔍 Tìm thấy tệp $ENV_FILE, đang nạp biến môi trường..."
+  source "$ENV_FILE"
+fi
+
+# ---------- User Input or Environment Variables ----------
 clear
 echo "========================================"
 echo "🔧 AZTEC PROVER DEPLOYMENT WIZARD"
 echo "========================================"
 
-read -p "👉 Enter WAN IP (e.g., 111.123.456.789): " WAN_IP
-validate_ip "$WAN_IP"
+# WAN IP
+WAN_IP=${WAN_IP:-}
+if [ -z "$WAN_IP" ]; then
+  echo "🔍 Đang lấy WAN IP tự động..."
+  WAN_IP=$(curl -s ifconfig.me)
+  if ! validate_ip "$WAN_IP"; then
+    echo "❌ Không thể lấy WAN IP tự động"
+    read -p "👉 Vui lòng nhập WAN IP thủ công (e.g., 111.123.456.789): " WAN_IP
+    validate_ip "$WAN_IP"
+  fi
+fi
+echo "✅ WAN IP: $WAN_IP"
 
-read -p "👉 Enter Sepolia RPC URL: " RPC_SEPOLIA
+# Sepolia RPC URL
+RPC_SEPOLIA=${RPC_SEPOLIA:-}
+if [ -z "$RPC_SEPOLIA" ]; then
+  read -p "👉 Enter Sepolia RPC URL: " RPC_SEPOLIA
+fi
 validate_url "$RPC_SEPOLIA"
 
-read -p "👉 Enter Beacon API URL: " BEACON_SEPOLIA
+# Beacon API URL
+BEACON_SEPOLIA=${BEACON_SEPOLIA:-}
+if [ -z "$BEACON_SEPOLIA" ]; then
+  read -p "👉 Enter Beacon API URL: " BEACON_SEPOLIA
+fi
 validate_url "$BEACON_SEPOLIA"
 
-read -p "👉 Enter Publisher Private Key: " PRIVATE_KEY
+# Publisher Private Key
+PRIVATE_KEY=${PRIVATE_KEY:-}
+if [ -z "$PRIVATE_KEY" ]; then
+  read -p "👉 Enter Publisher Private Key: " PRIVATE_KEY
+fi
 [ -z "$PRIVATE_KEY" ] && { echo "❌ Private Key required"; exit 1; }
 
-read -p "👉 Enter Prover ID: " PROVER_ID
+# Prover ID
+PROVER_ID=${PROVER_ID:-}
+if [ -z "$PROVER_ID" ]; then
+  read -p "👉 Enter Prover ID: " PROVER_ID
+fi
 [ -z "$PROVER_ID" ] && { echo "❌ Prover ID required"; exit 1; }
 
-read -p "👉 Number of agents (≥1): " AGENT_COUNT
-[[ "$AGENT_COUNT" =~ ^[0-9]+$ ]] && [ "$AGENT_COUNT" -ge 1 ] || {
-  echo "❌ Invalid agent count"; exit 1
-}
+# Number of Agents
+AGENT_COUNT=${AGENT_COUNT:-}
+if [ -z "$AGENT_COUNT" ]; then
+  read -p "👉 Number of agents (≥1): " AGENT_COUNT
+fi
+validate_number "$AGENT_COUNT"
+
+# ---------- Save to .env file ----------
+cat > "$ENV_FILE" <<EOF
+WAN_IP=$WAN_IP
+RPC_SEPOLIA=$RPC_SEPOLIA
+BEACON_SEPOLIA=$BEACON_SEPOLIA
+PRIVATE_KEY=$PRIVATE_KEY
+PROVER_ID=$PROVER_ID
+AGENT_COUNT=$AGENT_COUNT
+EOF
+echo "📝 Đã lưu các giá trị vào $ENV_FILE"
+
+# ---------- Create data directories ----------
+mkdir -p "$DATA_DIR/node" "$DATA_DIR/broker"
+echo "📁 Đã tạo thư mục dữ liệu: $DATA_DIR/node, $DATA_DIR/broker"
 
 # ---------- Generate docker-compose.yml ----------
 cat > docker-compose.yml <<EOF
