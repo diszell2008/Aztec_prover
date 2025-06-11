@@ -37,8 +37,13 @@ if ! command -v curl &> /dev/null; then
   exit 1
 fi
 
-if ! command -v docker &> /dev/null || ! command -v docker-compose &> /dev/null || ! command -v 'docker compose' &> /dev/null; then
-  echo "❌ Yêu cầu cài đặt Docker và Docker Compose"
+if ! command -v docker &> /dev/null; then
+  echo "❌ Yêu cầu cài đặt Docker. Hãy chạy: sudo apt-get install docker.io (hoặc tương tự)"
+  exit 1
+fi
+
+if ! docker compose version &> /dev/null && ! command -v docker-compose &> /dev/null; then
+  echo "❌ Yêu cầu cài đặt Docker Compose. Hãy chạy: sudo apt-get install docker-compose (hoặc cài Docker Compose Plugin)"
   exit 1
 fi
 
