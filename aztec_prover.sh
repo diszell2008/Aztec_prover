@@ -7,7 +7,7 @@
 # ---------- Defaults ----------
 IMAGE="aztecprotocol/aztec:0.87.8"
 NETWORK="alpha-testnet"
-DATA_DIR="$HOME/aztec-prover"
+DATA_DIR="/home/diszell2008/aztec-prover"
 P2P_PORT="40400"
 API_PORT="8080"
 ENV_FILE=".env"
