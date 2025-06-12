@@ -147,7 +147,7 @@ services:
       P2P_TCP_PORT: "$P2P_PORT"
       P2P_UDP_PORT: "$P2P_PORT"
       DATA_STORE_MAP_SIZE_KB: "134217728"
-      LOG_LEVEL: "debug"
+      LOG_LEVEL: "info"
       PROVER_BROKER_HOST: "http://broker:$API_PORT"
     ports:
       - "$API_PORT:$API_PORT"
@@ -164,7 +164,7 @@ services:
     environment:
       DATA_DIRECTORY: /data
       ETHEREUM_HOSTS: "$RPC_SEPOLIA"
-      LOG_LEVEL: "debug"
+      LOG_LEVEL: "info"
     volumes:
       - $DATA_DIR/broker:/data
 EOF
