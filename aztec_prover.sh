@@ -5,7 +5,7 @@
 # ======================
 
 # ---------- Defaults ----------
-IMAGE="aztecprotocol/aztec:1.1.2"
+IMAGE="aztecprotocol/aztec:1.2.0"
 NETWORK="alpha-testnet"
 DATA_DIR="/home/diszell2008/aztec-prover"
 P2P_PORT="40400"
